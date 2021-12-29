@@ -43,7 +43,7 @@ create_time = ("""CREATE TABLE IF NOT EXISTS time(start_time timestamp,\
 
 create_songplays = ("""CREATE TABLE IF NOT EXISTS songplays(songplay_id SERIAL,\
                                                      start_time timestamp,\
-                                                     user_id int,\
+                                                     user_id varchar,\
                                                      level varchar,\
                                                      song_id varchar,\
                                                      artist_id varchar,\
@@ -62,8 +62,8 @@ artists_data_insert_query = ("""INSERT INTO artists(artist_id,name,location,lati
                         values(%s,%s,%s,%s,%s) """)
 time_data_insert_query = ("""INSERT INTO time(start_time,hour,day,week,month,year,weekday) \
                         values(%s,%s,%s,%s,%s,%s,%s) """)
-songplays_data_insert_query = ("""INSERT INTO songplays(songplay_id,start_time,user_id,level,song_id,artist_id,session_id,location,user_agent) \
-                        values(%s,%s,%s,%s,%s,%s,%s,%s,%s) """)
+songplays_data_insert_query = ("""INSERT INTO songplays(start_time,user_id,level,song_id,artist_id,session_id,location,user_agent) \
+                        values(%s,%s,%s,%s,%s,%s,%s,%s) """)
 
 #Truncate Table Variables defined
 songs_data_truncate_query = ("""TRUNCATE TABLE songs""")
@@ -74,7 +74,8 @@ songplays_data_truncate_query = ("""TRUNCATE TABLE songplays""")
 
 #Variables desfined for Songplays table
 song_data_select = (""" Select a.song_id, b.artist_id from \
-public.songs a inner join public.artists b on a.artist_id = b.artist_id """)
+public.songs a inner join public.artists b on a.artist_id = b.artist_id \
+where a.title = %s and b.name = %s and a.duration = %s """)
 
 # creating a list of variables to be used for further implementation
 
