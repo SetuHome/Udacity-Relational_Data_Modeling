@@ -11,7 +11,7 @@ import pandas as pd
 import json
 import glob
 from array import *
-from sql_queries_prj import *
+from sql_queries import *
 import datetime
 import numpy as np
 

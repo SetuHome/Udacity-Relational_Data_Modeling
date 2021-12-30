@@ -1,70 +1,77 @@
-import psycopg2
-from sql_queries import create_table_queries, drop_table_queries
+# This Python file basically runs all SQL Queries which are responsible for dropping the table and recreating the table.
+# Also import the postgresql python package, creates the connection and assign a cursor for executing the queries.
 
+import psycopg2
+from sql_queries import drop_queries,create_queries
+
+#Creating the connection with default database
 
 def create_database():
-    """
-    - Creates and connects to the sparkifydb
-    - Returns the connection and cursor to sparkifydb
-    """
-    
-    # connect to default database
-    conn = psycopg2.connect("host=127.0.0.1 dbname=studentdb user=student password=student")
-    conn.set_session(autocommit=True)
-    cur = conn.cursor()
+
+    # creating the database connection with default database
+    try:
+        conn = psycopg2.connect("host=localhost user=s0k01c6 password=SetuHome")
+        print("Connection Successful")
+        curr = conn.cursor()
+        conn.set_session(autocommit=True)
+    except psycopg2.Error as e:
+        print("Error: Could not connect to the database")
+        print(e)
     
     # create sparkify database with UTF8 encoding
-    cur.execute("DROP DATABASE IF EXISTS sparkifydb")
-    cur.execute("CREATE DATABASE sparkifydb WITH ENCODING 'utf8' TEMPLATE template0")
-
-    # close connection to default database
-    conn.close()    
+    try:
+        curr.execute("DROP DATABASE IF EXISTS sparkifydb")
+        curr.execute("CREATE DATABASE sparkifydb WITH ENCODING 'utf8' TEMPLATE template0")
+        print("Database creation Successful")
+    except psycopg2.Error as e:
+        print("Error: Could not create the database")
+        print(e)
     
-    # connect to sparkify database
-    conn = psycopg2.connect("host=127.0.0.1 dbname=sparkifydb user=student password=student")
-    cur = conn.cursor()
+    #Closing the connection with current/default database
+    conn.close()
     
-    return cur, conn
+    # creating the database connection with sparkifydb database
+
+    try:
+        conn = psycopg2.connect("host=localhost dbname=sparkifydb user=s0k01c6 password=SetuHome")
+        print("Connection to sparkify database is successful")
+        curr = conn.cursor()
+        conn.set_session(autocommit=True)
+        return curr, conn
+    except psycopg2.Error as e:
+        print("Error: Could not create the database")
+        print(e)
 
 
-def drop_tables(cur, conn):
-    """
-    Drops each table using the queries in `drop_table_queries` list.
-    """
-    for query in drop_table_queries:
-        cur.execute(query)
-        conn.commit()
+def drop_tables(curr,conn):
+    #Processing the drop table query list created in the file sql_queries_prj.py
+    try:
+        for query in drop_queries:
+            curr.execute(query)
+            conn.commit()
+        print("All tables dropped successfully")
+    except psycopg2.Error as e:
+        print("Error: Could not execute the drop query successfully")
+        print(e)
 
 
-def create_tables(cur, conn):
-    """
-    Creates each table using the queries in `create_table_queries` list. 
-    """
-    for query in create_table_queries:
-        cur.execute(query)
-        conn.commit()
+def create_tables(curr,conn):
+    try:
+        for query in create_queries:
+            curr.execute(query)
+            conn.commit()
+        print("All tables created successfully")
+    except psycopg2.Error as e:
+        print("Error: Could not execute the create query successfully")
+        print(e) 
+
 
 
 def main():
-    """
-    - Drops (if exists) and Creates the sparkify database. 
-    
-    - Establishes connection with the sparkify database and gets
-    cursor to it.  
-    
-    - Drops all the tables.  
-    
-    - Creates all tables needed. 
-    
-    - Finally, closes the connection. 
-    """
-    cur, conn = create_database()
-    
-    drop_tables(cur, conn)
-    create_tables(cur, conn)
-
-    conn.close()
-
+    curr, conn = create_database()
+    drop_tables(curr,conn)
+    create_tables(curr,conn)
 
 if __name__ == "__main__":
     main()
+
