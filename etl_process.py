@@ -16,9 +16,10 @@ import datetime
 import numpy as np
 
 def main():
+    """The main function which calls other functions to process the song and log data.
+    """
     #The function below establishes the connection with the database
     curr, conn = create_connection()
-    
     # Calling functions to process and insert song and log data
     songs_data_insert(curr, conn, songdatafilepath, func = process_song_data)
     logs_data_insert(curr, conn, logdatafilepath, func = process_log_file_data)
@@ -27,6 +28,13 @@ def main():
 
 #Conection creation with the database
 def create_connection():
+    """Description: This function creates the database connection with sparkify database. Creates the connection object
+    and cursor object.
+
+    Returns:
+        curr: cursor object
+        conn: connection object
+    """
     try:
         conn = psycopg2.connect("host=localhost dbname=sparkifydb user=s0k01c6 password=SetuHome")
         curr = conn.cursor()
@@ -39,15 +47,32 @@ def create_connection():
 
 # Code to retrieve all .json files present under the spcified path
 def getallfiles(filepath):
-        all_files = []
-        for root, dir, files in os.walk(filepath):
-            files = glob.glob(os.path.join(root,'*.json'))
-            for f in files:
-                all_files.append(os.path.abspath(f))
+    """This function takes the filepath as input and returns all the files with .json extension
+
+    Args:
+        filepath ([string]): [log data or song data file path]
+
+    Returns:
+        all_fils: a list containing the path of json files.
+    """
+    all_files = []
+    for root, dir, files in os.walk(filepath):
+        files = glob.glob(os.path.join(root,'*.json'))
+        for f in files:
+            all_files.append(os.path.abspath(f))
         return all_files
 
 # Code to start the processing and inserting song data 
 def songs_data_insert(curr, conn, songdatafilepath, func):
+    """[This function process the song data and also responsible for truncating the tables before data load. It iterates 
+    over the song data file list to call the execute function responisble for inserting the data in Songs and Artists table ]
+
+    Args:
+        curr : [the cursor object]
+        conn : [the connection object]
+        songdatafilepath : [song data file path]
+        func : [function that transforms the data and inserts it into the database]
+    """
     print(songdatafilepath)
     
     # Truncating song and artists table before loading the data
@@ -67,6 +92,15 @@ def songs_data_insert(curr, conn, songdatafilepath, func):
         
 
 def logs_data_insert(curr, conn, logdatafilepath, func):
+    """[This function process the log data and also responsible for truncating the tables before data load. It iterates 
+    over the song data file list to call the execute function responisble for inserting the data in users, time and songplays table ]
+
+    Args:
+        curr : [the cursor object]
+        conn : [the connection object]
+        logdatafilepath : [log data file path]
+        func : [function that transforms the data and inserts it into the database]
+    """
     print(logdatafilepath)
     
     #Truncating users, time and songplays tables before loading the data
@@ -88,6 +122,12 @@ def logs_data_insert(curr, conn, logdatafilepath, func):
 
 
 def process_song_data(curr,filepath):
+    """The function is responsible for processing the song data records and insert into the song and artists tables in the database.
+
+    Args:
+        curr : [the cursor object]
+        filepath : [The path of the song data file]
+    """
     
     # Code to read json files specidied in the variable filepath 
     songdf = pd.read_json(filepath,lines=True)
@@ -106,6 +146,13 @@ def process_song_data(curr,filepath):
 
 
 def process_log_file_data(curr, filepath):
+    """The function is responsible for processing the log data records and insert into the users, time and songplays tables in the 
+    database
+
+    Args:
+        curr : [the cursor object]
+        filepath : [The log data file path]
+    """
 
     # Code to read json files specidied in the variable filepath 
     logdf = pd.read_json(filepath,lines=True)
@@ -137,6 +184,7 @@ def process_log_file_data(curr, filepath):
     # Code to Insert songplays data to the table
     # Code to frame the list from given dataframe for songplays table
     for index, row in logdf.iterrows():
+
         #Code to fetch song_id and artist_id based on value of song, artist and length of song      
         curr.execute(song_data_select,(row.song, row.artist, row.length))
         results = curr.fetchone()
@@ -160,6 +208,8 @@ def close_connection(curr, conn):
 
 # Creating the main function for the python program
 if __name__ == "__main__":
+    """[The main function of the ETL Process]
+    """
     #Assigning file path name for song and log data
     songdatafilepath = '/Users/s0k01c6/Documents/MyGitRepos/Udacity-Relational_Data_Modeling/data/song_data'
     logdatafilepath = '/Users/s0k01c6/Documents/MyGitRepos/Udacity-Relational_Data_Modeling/data/log_data'

@@ -7,7 +7,13 @@ from sql_queries import drop_queries,create_queries
 #Creating the connection with default database
 
 def create_database():
+    """This function creates the database connection with admin user, drop the database and create sparkify database and 
+    assign the connection object.
 
+    Returns:
+        curr: The cursor object
+        conn: The connection object
+    """
     # creating the database connection with default database
     try:
         conn = psycopg2.connect("host=localhost user=s0k01c6 password=SetuHome")
@@ -44,6 +50,12 @@ def create_database():
 
 
 def drop_tables(curr,conn):
+    """This function drops the tables
+
+    Args:
+        curr : [The cursor object]
+        conn : [The connection object]
+    """
     #Processing the drop table query list created in the file sql_queries_prj.py
     try:
         for query in drop_queries:
@@ -56,6 +68,12 @@ def drop_tables(curr,conn):
 
 
 def create_tables(curr,conn):
+    """This function is responsible for creating the tables
+
+    Args:
+        curr : [The cursor object]
+        conn : [The connection object]
+    """
     try:
         for query in create_queries:
             curr.execute(query)
@@ -68,10 +86,14 @@ def create_tables(curr,conn):
 
 
 def main():
+    """This function is responsible for calling create connection function and drop table and create tables function
+    """
     curr, conn = create_database()
     drop_tables(curr,conn)
     create_tables(curr,conn)
 
 if __name__ == "__main__":
+    """Calling the main function
+    """
     main()
 

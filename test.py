@@ -5,6 +5,12 @@ import psycopg2
 
 
 def create_dbconnect():
+    """This function basically craetes the connection with the database
+
+    Returns:
+        curr: the cursor object
+        conn: the connection object
+    """
     try:
         conn = psycopg2.connect("host=localhost dbname=sparkifydb user=s0k01c6 password=SetuHome")
         curr = conn.cursor()
@@ -17,6 +23,11 @@ def create_dbconnect():
         print(e)
 
 def songs_count(curr):
+    """This function calculates the number of rows present in song table
+
+    Args:
+        curr : [The cursor object]
+    """
     try:
         curr.execute("Select * from songs limit 5")
         row = curr.fetchone()
@@ -29,6 +40,11 @@ def songs_count(curr):
         print(e) 
 
 def artists_count(curr):
+    """This function calculates the number of rows present in artists table
+
+    Args:
+        curr : [The cursor object]
+    """
     try:
         curr.execute("Select * from artists limit 5")
         row = curr.fetchone()
@@ -41,6 +57,11 @@ def artists_count(curr):
         print(e)
 
 def users_count(curr):
+    """This function calculates the number of rows present in users table
+
+    Args:
+    curr : [The cursor object]
+    """
     try:
         curr.execute("Select * from users limit 5")
         row = curr.fetchone()
@@ -53,6 +74,11 @@ def users_count(curr):
         print(e)
 
 def time_count(curr):
+    """This function calculates the number of rows present in time table
+
+    Args:
+        curr : [The cursor object]
+    """
     try:
         curr.execute("Select * from time limit 5")
         row=curr.fetchone()
@@ -66,6 +92,11 @@ def time_count(curr):
 
 
 def songplays_count(curr):
+    """This function calculates the number of rows present in songplays table
+
+    Args:
+        curr: [The cursor object]
+    """
     try:
         curr.execute("Select * from songplays limit 5")
         row = curr.fetchone()
@@ -82,6 +113,8 @@ def close_connection(curr, conn):
     conn.close()
 
 def main():
+    """This function basically calls different functions which shows the table count value
+    """
 
     curr, conn = create_dbconnect()
     songs_count(curr)
@@ -93,4 +126,6 @@ def main():
 
 
 if __name__ == "__main__":
+    """This function is the main function
+    """
     main()
