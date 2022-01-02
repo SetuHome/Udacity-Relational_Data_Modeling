@@ -6,6 +6,7 @@
 from io import DEFAULT_BUFFER_SIZE
 import os
 import sys
+from pandas.core.indexes.api import all_indexes_same
 import psycopg2
 import pandas as pd
 import json
@@ -20,9 +21,11 @@ def main():
     """
     #The function below establishes the connection with the database
     curr, conn = create_connection()
+
     # Calling functions to process and insert song and log data
     songs_data_insert(curr, conn, songdatafilepath, func = process_song_data)
     logs_data_insert(curr, conn, logdatafilepath, func = process_log_file_data)
+    
     #Calling a function to close the connection with the database
     close_connection(curr, conn)
 
@@ -47,20 +50,12 @@ def create_connection():
 
 # Code to retrieve all .json files present under the spcified path
 def getallfiles(filepath):
-    """This function takes the filepath as input and returns all the files with .json extension
-
-    Args:
-        filepath ([string]): [log data or song data file path]
-
-    Returns:
-        all_fils: a list containing the path of json files.
-    """
     all_files = []
     for root, dir, files in os.walk(filepath):
         files = glob.glob(os.path.join(root,'*.json'))
         for f in files:
             all_files.append(os.path.abspath(f))
-        return all_files
+    return all_files
 
 # Code to start the processing and inserting song data 
 def songs_data_insert(curr, conn, songdatafilepath, func):
@@ -78,11 +73,12 @@ def songs_data_insert(curr, conn, songdatafilepath, func):
     # Truncating song and artists table before loading the data
     curr.execute (songs_data_truncate_query)
     curr.execute (artists_data_truncate_query)
+    print("Both tables truncated")
 
     # To get the details of all files in a list with absolute path
     song_data_files = getallfiles(songdatafilepath)
 
-    # To get the length of list in song_data_files
+    #To get the length of list in song_data_files
     filedata = len(song_data_files)
     print("The length of the song list is: {} and found at the path {}".format(filedata,songdatafilepath))
 
@@ -159,11 +155,16 @@ def process_log_file_data(curr, filepath):
     
     #Code to Insert users data to the table
     # Code to frame the list from given dataframe for users table
-    userdf = logdf[['userId','firstName','lastName','gender','level']].values.tolist()
+    userdatadf = logdf[['userId','firstName','lastName','gender','level']]
+    userdatadf = userdatadf.drop_duplicates()
+    index = userdatadf[userdatadf['userId'] == ''].index
+    userdatadf.drop(index, inplace=True)
+    userdf = userdatadf[['userId','firstName','lastName','gender','level']].values.tolist()
+ 
     #Iterating over the list data to insert records in users table
     for userdatafiles in userdf:
         curr.execute(users_data_insert_query,userdatafiles)
-    
+
     #Code to Insert time data to the table
     # Code to frame the list from given dataframe for time table
     df = pd.to_numeric(logdf["ts"])
@@ -179,7 +180,6 @@ def process_log_file_data(curr, filepath):
         week = datetime.date(year,month,day).isocalendar().week
         timedatalist = [dt,hour,day,week,month,year,weekday]
         curr.execute(time_data_insert_query,timedatalist)
-    print("time table data insertion successful")
 
     # Code to Insert songplays data to the table
     # Code to frame the list from given dataframe for songplays table

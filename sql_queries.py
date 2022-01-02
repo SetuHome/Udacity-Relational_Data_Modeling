@@ -21,7 +21,7 @@ create_users = ("""CREATE TABLE IF NOT EXISTS users(user_id int,\
 
 create_songs = ("""CREATE TABLE IF NOT EXISTS songs(song_id varchar,\
                                                    title varchar,\
-                                                   artist_id varchar,\
+                                                   artist_id varchar NOT NULL,\
                                                     year int,\
                                                     duration decimal,\
                                                     CONSTRAINT song_key PRIMARY KEY (song_id))""")
@@ -33,35 +33,45 @@ create_artists = ("""CREATE TABLE IF NOT EXISTS artists(artist_id varchar,\
                                                      longitude decimal,\
                                                      CONSTRAINT artist_key PRIMARY KEY (artist_id))""")
 
-create_time = ("""CREATE TABLE IF NOT EXISTS time(start_time timestamp,\
+create_time = ("""CREATE TABLE IF NOT EXISTS time(start_time timestamp NOT NULL,\
                                                      hour varchar,\
                                                      day varchar,\
                                                      week varchar,\
                                                      month varchar,\
                                                      year varchar,\
-                                                     weekday varchar)""")
+                                                     weekday varchar,\
+                                                     CONSTRAINT time_unique UNIQUE (start_time,hour,day,week,month,year))""")
 
 create_songplays = ("""CREATE TABLE IF NOT EXISTS songplays(songplay_id SERIAL,\
-                                                     start_time timestamp,\
-                                                     user_id varchar,\
+                                                     start_time timestamp NOT NULL,\
+                                                     user_id varchar NOT NULL,\
                                                      level varchar,\
                                                      song_id varchar,\
                                                      artist_id varchar,\
                                                      session_id varchar,\
                                                      location varchar,\
-                                                     user_agent varchar,
+                                                     user_agent varchar,\
                                                      CONSTRAINT songplays_key UNIQUE (songplay_id,user_id,song_id,artist_id,start_time))""")
 
 #Insert Table Variables defined
 
 users_data_insert_query = ("""INSERT INTO users(user_id,first_name,last_name,gender,level) \
-                        values(%s,%s,%s,%s,%s)""")
+                          values(%s,%s,%s,%s,%s) \
+                          ON CONFLICT (user_id) \
+                          DO
+                          UPDATE SET level = EXCLUDED.level""")
 songs_data_insert_query = ("""INSERT INTO songs(song_id,title,artist_id,year,duration) \
-                        values(%s,%s,%s,%s,%s)""")
+                           values(%s,%s,%s,%s,%s) \
+                           ON CONFLICT (song_id) \
+                           DO NOTHING""")
 artists_data_insert_query = ("""INSERT INTO artists(artist_id,name,location,latitude,longitude) \
-                        values(%s,%s,%s,%s,%s) """)
+                            values(%s,%s,%s,%s,%s) \
+                            ON CONFLICT (artist_id) \
+                            DO NOTHING""")
 time_data_insert_query = ("""INSERT INTO time(start_time,hour,day,week,month,year,weekday) \
-                        values(%s,%s,%s,%s,%s,%s,%s) """)
+                          values(%s,%s,%s,%s,%s,%s,%s) \
+                          ON CONFLICT ON CONSTRAINT time_unique \
+                          DO NOTHING """)
 songplays_data_insert_query = ("""INSERT INTO songplays(start_time,user_id,level,song_id,artist_id,session_id,location,user_agent) \
                         values(%s,%s,%s,%s,%s,%s,%s,%s) """)
 
