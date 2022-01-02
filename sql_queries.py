@@ -56,24 +56,19 @@ create_songplays = ("""CREATE TABLE IF NOT EXISTS songplays(songplay_id SERIAL,\
 #Insert Table Variables defined
 
 users_data_insert_query = ("""INSERT INTO users(user_id,first_name,last_name,gender,level) \
-                          values(%s,%s,%s,%s,%s) \
-                          ON CONFLICT (user_id) \
-                          DO
-                          UPDATE SET level = EXCLUDED.level""")
+                                values(%s,%s,%s,%s,%s) \
+                                    ON CONFLICT (user_id) DO UPDATE SET level = EXCLUDED.level""")
 songs_data_insert_query = ("""INSERT INTO songs(song_id,title,artist_id,year,duration) \
-                           values(%s,%s,%s,%s,%s) \
-                           ON CONFLICT (song_id) \
-                           DO NOTHING""")
+                                values(%s,%s,%s,%s,%s) \
+                                    ON CONFLICT (song_id) DO NOTHING""")
 artists_data_insert_query = ("""INSERT INTO artists(artist_id,name,location,latitude,longitude) \
-                            values(%s,%s,%s,%s,%s) \
-                            ON CONFLICT (artist_id) \
-                            DO NOTHING""")
+                                    values(%s,%s,%s,%s,%s) \
+                                        ON CONFLICT (artist_id) DO NOTHING""")
 time_data_insert_query = ("""INSERT INTO time(start_time,hour,day,week,month,year,weekday) \
-                          values(%s,%s,%s,%s,%s,%s,%s) \
-                          ON CONFLICT ON CONSTRAINT time_unique \
-                          DO NOTHING """)
+                                values(%s,%s,%s,%s,%s,%s,%s) \
+                                    ON CONFLICT ON CONSTRAINT time_unique DO NOTHING """)
 songplays_data_insert_query = ("""INSERT INTO songplays(start_time,user_id,level,song_id,artist_id,session_id,location,user_agent) \
-                        values(%s,%s,%s,%s,%s,%s,%s,%s) """)
+                                    values(%s,%s,%s,%s,%s,%s,%s,%s) """)
 
 #Truncate Table Variables defined
 songs_data_truncate_query = ("""TRUNCATE TABLE songs""")
